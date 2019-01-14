@@ -24,4 +24,30 @@ describe Oystercard do
       expect(subject.balance).to eq 15
     end
   end
+
+  describe '#in_journey' do
+      it 'should return true' do
+        expect(subject.in_journey).to eq false
+      end
+    end
+
+    describe '#in_journey?' do
+      it 'should return true' do
+        expect(subject).to_not be_in_journey
+      end
+  end
+
+    describe '#touch_in' do
+      it 'should update in journey to true' do
+        subject.touch_in
+        expect(subject.in_journey).to eq true
+      end
+    end
+
+    describe '#touch_out' do
+      it 'should update in journey to false' do
+        subject.touch_out
+        expect(subject.in_journey).to eq false
+      end
+    end
 end
