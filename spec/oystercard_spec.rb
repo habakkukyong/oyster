@@ -1,6 +1,10 @@
 require 'oystercard'
 
 describe Oystercard do
+
+  let(:journey) { double :journey }
+  let(:station) { double :station }
+
   it 'has default max balance of 90' do
     expect(Oystercard::DEFAULT_MAX).to eq 90
   end
@@ -40,14 +44,18 @@ describe Oystercard do
       context 'when balance 1' do
         it 'should update in journey to true' do
           subject.instance_variable_set(:@balance, Oystercard::DEFAULT_MIN)
-          subject.touch_in
+          subject.touch_in("Station")
           expect(subject.in_journey).to eq true
+        end
+        it 'should record the journey ID in journies array' do
+          subject.record_new_journey(station)
+          expect(subject.journeys.first.start).to eq station
         end
     end
 
     context "with balance 0" do
       it 'should not allow touching in' do
-        expect { subject.touch_in }.to raise_error "Insufficient balance"
+        expect { subject.touch_in("Station") }.to raise_error "Insufficient balance"
       end
     end
   end
