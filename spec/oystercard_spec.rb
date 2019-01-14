@@ -19,7 +19,7 @@ describe Oystercard do
   describe '#deduct' do
     it 'should deduct an amount from the balance' do
       subject.instance_variable_set(:@balance, 20)
-      subject.deduct(5)
+      subject.touch_out(5)
       expect(subject.balance).to eq 15
     end
   end
@@ -54,8 +54,15 @@ describe Oystercard do
 
     describe '#touch_out' do
       it 'should update in journey to false' do
-        subject.touch_out
+        subject.touch_out(1)
         expect(subject.in_journey).to eq false
+      end
+
+      context 'when balance is 1 or more' do
+        it 'should deduct the amount from the balance' do
+          subject.instance_variable_set(:@balance, Oystercard::DEFAULT_MIN)
+          expect {subject.touch_out(5)}.to change{subject.balance}.by(-5)
+        end
       end
     end
 end

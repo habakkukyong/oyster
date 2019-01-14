@@ -14,19 +14,22 @@ class Oystercard
     amount + balance < max_balance ? @balance += amount : (raise "Max balance is #{max_balance}")
   end
 
-  def deduct(amount)
-    @balance -= amount
-  end
-
   def touch_in
-    @balance >= DEFAULT_MIN ? @in_journey = true : (raise "Insufficient balance")
+    @balance >= DEFAULT_MIN ? @in_journey = true : (raise 'Insufficient balance')
   end
 
-  def touch_out
+  def touch_out(amount)
     @in_journey = false
+    deduct(amount)
   end
 
   def in_journey?
     @in_journey
+  end
+
+  private
+
+  def deduct(amount)
+    @balance -= amount
   end
 end
