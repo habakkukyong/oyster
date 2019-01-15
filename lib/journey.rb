@@ -3,5 +3,4 @@ class Journey
   def initialize(station)
     @start = station
   end
-
 end

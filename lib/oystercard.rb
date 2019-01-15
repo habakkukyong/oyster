@@ -1,5 +1,8 @@
+require_relative 'journey.rb'
+
+# Is oystercard
 class Oystercard
-  attr_reader :balance, :max_balance, :in_journey, :journeys
+  attr_reader :balance, :max_balance, :in_journey, :journeys, :entry, :exit_station
 
   DEFAULT_MAX = 90
   DEFAULT_MIN = 1
@@ -7,33 +10,40 @@ class Oystercard
   def initialize
     @balance = 0
     @max_balance = DEFAULT_MAX
-    @in_journey = false
-    @journeys =[]
+    @journeys = []
+    @entry = nil
+    @exit_station = nil
   end
 
   def topup(amount)
-    amount + balance < max_balance ? @balance += amount : (raise "Max balance is #{max_balance}")
+    raise "Max balance is #{max_balance}" if amount + balance >= max_balance
+
+    @balance += amount
   end
 
   def touch_in(station)
-    @balance >= DEFAULT_MIN ? @in_journey = true : (raise 'Insufficient balance')
-    record_new_journey(station)
+    raise 'Insufficient balance' unless sufficient_balance?
+
+    @entry = station
+    @journeys << { entry: station }
   end
 
-  def record_new_journey(station)
-    @journeys << Journey.new(station)
-  end
-
-  def touch_out(amount)
-    @in_journey = false
+  def touch_out(amount, station)
     deduct(amount)
+    @exit_station = station
+    @journeys.last[:exit_station] = station
+    @entry = nil
   end
 
   def in_journey?
-    @in_journey
+    !!@entry
   end
 
   private
+
+  def sufficient_balance?
+    balance >= DEFAULT_MIN
+  end
 
   def deduct(amount)
     @balance -= amount
