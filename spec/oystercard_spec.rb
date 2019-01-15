@@ -50,11 +50,6 @@ describe Oystercard do
         expect(subject.in_journey?).to eq true
       end
 
-      it 'should set the entry instance variable to the station passed in' do
-        subject.touch_in(station)
-        expect(subject.entry).to eq station
-      end
-
       it 'stores entry station in journeys array' do
         subject.touch_in(station)
         expect(subject.journeys[0][:entry]).to eq station
@@ -78,18 +73,6 @@ describe Oystercard do
           subject.instance_variable_set(:@balance, 1)
           subject.touch_out(1,station)
           expect(subject.in_journey?).to eq false
-        end
-
-        it 'should set entry point to nil' do
-          subject.instance_variable_set(:@balance, 1)
-          subject.instance_variable_set(:@entry, station)
-          subject.touch_out(1,station)
-          expect(subject.entry).to eq nil
-        end
-
-        it 'should accept an exit point as well as the journey fare' do
-          subject.touch_out(1, station)
-          expect(subject.exit_station).to eq station
         end
       end
 

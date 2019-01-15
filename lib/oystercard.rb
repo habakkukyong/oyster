@@ -11,8 +11,8 @@ class Oystercard
     @balance = 0
     @max_balance = DEFAULT_MAX
     @journeys = []
-    @entry = nil
-    @exit_station = nil
+    #@entry = nil
+    #@exit_station = nil
   end
 
   def topup(amount)
@@ -24,19 +24,19 @@ class Oystercard
   def touch_in(station)
     raise 'Insufficient balance' unless sufficient_balance?
 
-    @entry = station
+    #@entry = station
     @journeys << { entry: station }
   end
 
   def touch_out(amount, station)
     deduct(amount)
-    @exit_station = station
+    #@exit_station = station
     @journeys.last[:exit_station] = station
-    @entry = nil
+    #@entry = nil
   end
 
   def in_journey?
-    !!@entry
+    @journeys.empty? ? false : @journeys.last.has_key?(:entry)
   end
 
   private
