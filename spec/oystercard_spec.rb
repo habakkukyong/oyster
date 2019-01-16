@@ -44,62 +44,50 @@ describe Oystercard do
       before do
         subject.instance_variable_set(:@balance, Oystercard::DEFAULT_MIN)
       end
+    end
 
-      it 'should update in journey to true' do
-        subject.touch_in(station)
-        expect(subject.in_journey?).to eq true
-      end
-
-      it 'stores entry station in journeys array' do
-        subject.touch_in(station)
-        expect(subject.journeys[0][:entry]).to eq station
+    context 'with balance 0' do
+      it 'should not allow touching in' do
+        expect { subject.touch_in('Station') }.to raise_error 'Insufficient balance'
       end
     end
   end
 
-  context "with balance 0" do
-    it 'should not allow touching in' do
-      expect { subject.touch_in("Station") }.to raise_error "Insufficient balance"
+  describe '#touch_out' do
+    context 'when a journey has been started' do
+      before do
+        subject.instance_variable_set(:@journeys, [{}])
+      end
+    end
+
+    context 'when a journey is complete' do
+      it 'should store the journey' do
+        subject.instance_variable_set(:@journeys, [{}])
+        subject.touch_out(1, station)
+        expect(subject.journeys[0][:exit_station]).to eq station
+      end
+    end
+
+    context 'when balance is 1 or more' do
+      it 'should deduct the amount from the balance' do
+        subject.instance_variable_set(:@journeys, [{}])
+        subject.instance_variable_set(:@balance, Oystercard::DEFAULT_MIN)
+        expect { subject.touch_out(5, station) }.to change{ subject.balance }.by(-5)
+      end
+    end
+
+    context 'when a second journey is completed' do
+      # new oyster
+      # user touches in at 1 and out 2
+      # user touches in at 3 and out 4
+      # expect journeys to be [{entry: 1, exit: 2}, {entry: 3, exit: 4}]
+      it 'will store that journey after the first' do # TEST IS WRONG MAKE IT DO THE ABOVE AND RENAME
+        subject.instance_variable_set(:@journeys, [{}])
+        subject.instance_variable_set(:@balance, 1)
+        subject.touch_in(station)
+        subject.touch_out(1, station)
+        expect(subject.journeys).to eq [{}, { entry: station, exit_station: station }]
+      end
     end
   end
-
-    describe "#touch_out" do
-      context 'when a journey has been started' do
-        before do
-          subject.instance_variable_set(:@journeys, [{}])
-        end
-
-        it 'should update in journey to false' do
-          subject.instance_variable_set(:@balance, 1)
-          subject.touch_out(1,station)
-          expect(subject.in_journey?).to eq false
-        end
-      end
-
-      context "when a journey is complete" do
-        it 'should store the journey' do
-          subject.instance_variable_set(:@journeys, [{}])
-          subject.touch_out(1, station)
-          expect(subject.journeys[0][:exit_station]).to eq station
-        end
-      end
-
-      context 'when balance is 1 or more' do
-        it 'should deduct the amount from the balance' do
-          subject.instance_variable_set(:@journeys, [{}])
-          subject.instance_variable_set(:@balance, Oystercard::DEFAULT_MIN)
-          expect { subject.touch_out(5, station) }.to change{ subject.balance }.by(-5)
-        end
-      end
-
-      context 'when a second journey is completed' do
-        it 'will store that journey after the first' do
-          subject.instance_variable_set(:@journeys, [{}])
-          subject.instance_variable_set(:@balance, 1)
-          subject.touch_in(station)
-          subject.touch_out(1, station)
-          expect(subject.journeys).to eq [{}, { entry: station, exit_station: station }]
-        end
-      end
-    end
 end

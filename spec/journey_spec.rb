@@ -11,14 +11,35 @@ describe Journey do
     expect(subject.finish_station).to eq nil
   end
 
-  it 'can be initialized with a starting station' do
-    expect(Journey.new(station).start_station).to eq station
+  describe '#receive_touch_in' do
+    context 'when told where the user has touched in' do
+      let(:recipient_journey) { Journey.new }
+      before do
+        recipient_journey.receive_touch_in(station)
+      end
+      it 'sets the start of the journey to that station' do
+        expect(recipient_journey.start_station).to eq station
+      end
+
+      it 'should update in journey to true' do
+        expect(recipient_journey.in_journey).to eq true
+      end
+    end
   end
 
-  describe '#finish' do
-    it 'stores the finish station on the Journey' do
-      subject.finish(station)
-      expect(subject.finish_station).to eq station
+  describe '#receive_touch_out' do
+    context 'when told where the user has touched in' do
+      let(:recipient_journey) { Journey.new }
+      before do
+        recipient_journey.receive_touch_out(station)
+      end
+      it 'sets the end of the journey to that station' do
+        expect(recipient_journey.exit_station).to eq station
+      end
+
+      it 'should update in journey to false' do
+        expect(recipient_journey.in_journey).to eq false
+      end
     end
   end
 end
